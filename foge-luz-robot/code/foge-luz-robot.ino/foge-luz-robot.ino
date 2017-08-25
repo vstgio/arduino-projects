@@ -13,8 +13,8 @@ O CÓDIGO FOI PRODUZIDO DURANTE AULA DE
 
 int valorLDR; //CRIA UMA VARIÁVEL PARA ARMAZENAR OS DADOS LIDOS PELO LDR
 
-AF_DCMotor motor_d(4); //MOTOR DC NA LIGAÇÃO M4 DO SHIELD
-AF_DCMotor motor_e(3); //MOTOR DC NA LIGAÇÃO M3 DO SHIELD
+AF_DCMotor motor_d(1); //MOTOR DC NA LIGAÇÃO M4 DO SHIELD
+AF_DCMotor motor_e(2); //MOTOR DC NA LIGAÇÃO M3 DO SHIELD
 
 void setup() {
   pinMode(A5, INPUT); //PINO RESPONSÁVEL PELA LEITURA DO LDR
@@ -28,7 +28,7 @@ void loop() {
 
   //VERIFICA O VALOR LIDO PELO LDR. O VALOR 550 FOI ESTABELECIDO DE ACORDO COM AS CONDIÇÕES DE ILUMINAÇÃO DO DIA E DO LOCAL ONDE O ROBÔ FOI MONTADO. 
   //É IMPORTANTE QUE SEJA MELHOR CALIBRADO.
-  while(valorLDR >= 550) {
+  while(valorLDR >= 700) {
 
     //ROTACIONA O ROBÔ
     motor_d.setSpeed(255);
@@ -46,6 +46,7 @@ void loop() {
 
     //ARMAZENA NOVAMENTE O VALOR DO LDR PARA VERIFICAR SE A CONDIÇÃO DO LOOP FOI ATENDIDA
     valorLDR = analogRead(A5);
+
   }
   
   //DESLIGA OS MOTOROES E "ESTACIONA" O ROBÔ
@@ -53,5 +54,6 @@ void loop() {
   motor_e.setSpeed(0);
   motor_e.run(RELEASE);
   motor_d.run(RELEASE);
-  
+
+  delay(100);
 }
