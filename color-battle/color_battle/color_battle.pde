@@ -2,18 +2,23 @@ import processing.serial.*;
 
 Serial port;
 String arduinovalue;
+String[] separatedvalues;
+int score;
 int newlinecode = 10;
 
 void setup() {
   fullScreen();
+  score = width/2;
+  
   noStroke();
   background(89, 171, 227);
   fill(242, 121, 53);
+  rect(0, 0, score, height);
   
   port = new Serial(this, Serial.list()[Serial.list().length-1], 9600);
   port.clear();
   arduinovalue = port.readStringUntil(newlinecode);
-  arduinovalue = null;
+  arduinovalue = null;  
 }
 
 void draw() {
@@ -22,7 +27,15 @@ void draw() {
        
     if (arduinovalue != null) {
       background(89, 171, 227);
-      rect(0, 0, int(arduinovalue.trim()), height);
+      separatedvalues = split(arduinovalue.trim(), ",");
+      
+      if (int(separatedvalues[0]) == 1 && int(separatedvalues[1]) == 0) {
+        score = score + 1;           
+      }
+      else if (int(separatedvalues[0]) == 0 && int(separatedvalues[1]) == 1) {
+        score = score - 1;
+      }
+      rect(0, 0, score, height);
     }
   }
 }
