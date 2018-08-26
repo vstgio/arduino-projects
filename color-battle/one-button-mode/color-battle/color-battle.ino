@@ -14,14 +14,12 @@ void loop() {
     if (digitalRead(2) == true) {
       player01_last_state = true;
       player01_state = true;
-    }
-    
+    } 
     else {
       player01_last_state = false;
       player01_state = false;
     }
   }
-  
   else {
       player01_state = false;
   }
@@ -31,13 +29,11 @@ void loop() {
       player02_last_state = true;
       player02_state = true;
     }
-  
     else {
       player02_last_state = false;
       player02_state = false;
     }
   }
-  
   else {
       player02_state = false;
   }

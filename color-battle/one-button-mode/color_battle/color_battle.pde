@@ -2,7 +2,7 @@ import processing.serial.*;
 
 Serial port;
 color color01 = color(142, 68, 173);   //player 01 color antiga: 242, 121, 53
-color color02 = color(38, 166, 91);   //player 02 color antiga: 89, 171, 227
+color color02 = color(38, 166, 91);    //player 02 color antiga: 89, 171, 227
 color color03 = color(0, 0, 0);        //game over background
 color color04 = color(255, 255, 255);  //game over text color
 color winnercolor;
@@ -17,9 +17,9 @@ int[] istimetorestart = {0, 0};
 PFont font;
 
 void setup() {
-  size(1000,600);
   score = proportion/2;
   
+  fullScreen();
   noStroke();
   background(color02);
   fill(color01);
@@ -52,8 +52,6 @@ void draw() {
       
       if (isgamerunning) {
         runGame(separatedvalues);
-        //println(isgamerunning);
-        //println(score);
       }
       else {
         runGameOver(separatedvalues);
@@ -90,10 +88,6 @@ void runGameOver(String[] separatedvalues) {
   if (int(separatedvalues[1]) == 1 && istimetorestart[1] != 1) {
     istimetorestart[1] = 1;
   }
-  
-  //print(istimetorestart[0] == 1 ? "APERTOU e " : "não e ");
-  //print(istimetorestart[1] == 1 ? "APERTOU" : "não");
-  
   if (istimetorestart[0] == 1 && istimetorestart[1] == 1) {
     score = 20;
     winner = 0;
