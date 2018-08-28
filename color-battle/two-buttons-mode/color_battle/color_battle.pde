@@ -1,10 +1,11 @@
 import processing.serial.*;
 
 Serial port;
-color color01 = color(142, 68, 173);   //player 01 color antiga: 242, 121, 53
-color color02 = color(38, 166, 91);    //player 02 color antiga: 89, 171, 227
+color color01 = color(162, 222, 208);  //player 01 color
+color color02 = color(253, 227, 167);  //player 02 color
 color color03 = color(0, 0, 0);        //game over background
 color color04 = color(255, 255, 255);  //game over text color
+int buttonwidth = 20;
 color winnercolor;
 String arduinovalue;
 String[] separatedvalues;
@@ -13,13 +14,17 @@ int proportion = 40;
 int newlinecode = 10;
 Boolean isgamerunning = true;
 int winner = 0;
-int[] istimetorestart = {0, 0};
+int[] istimetorestart = {0, 0, 0, 0};
 PFont font;
 
+int now = -1;
+int randomround;
+int mode;
+
 void setup() {
+  size(1000, 600);
   score = proportion/2;
   
-  size(1000, 600);
   noStroke();
   background(color02);
   fill(color01);
@@ -34,10 +39,13 @@ void setup() {
 }
 
 void draw() {
+  calculateRandomRound();
+  
   if (isgamerunning) {
     background(color02);
     fill(color01);
-    rect(0, 0, score*(width/proportion), height);  
+    rect(0, 0, score*(width/proportion), height);
+    drawButtonColor();
   }
   else {
     background(color03);
@@ -48,7 +56,9 @@ void draw() {
     arduinovalue = port.readStringUntil(newlinecode);     
     
     if (arduinovalue != null) {
+      //println(arduinovalue);
       separatedvalues = split(arduinovalue.trim(), ",");
+      //println(separatedvalues);
       
       if (isgamerunning) {
         runGame(separatedvalues);
@@ -60,12 +70,62 @@ void draw() {
   }
 }
 
-void runGame (String[] separatedvalues) {
-  if (int(separatedvalues[0]) == 1 && int(separatedvalues[1]) == 0) {
-    score = score + 1;           
+void drawButtonColor() {
+    if (mode == 1) {
+      fill(142, 68, 173); //roxo botão 01
+    }
+    else {
+      fill(38, 166, 91);  //verde botão 02
+    }
+    
+    rect(0, 0, buttonwidth, height);    
+    rect(width-buttonwidth, 0, buttonwidth, height);
+    noStroke();
+}
+
+void calculateRandomRound() {
+  if (now == -1) {
+      now = second();
+      randomround = int(random(2, 9));
+      mode = int(random(1, 3));
+      println("Estamos no modo " + mode + " por " + randomround + " segundos!");
   }
-  else if (int(separatedvalues[0]) == 0 && int(separatedvalues[1]) == 1) {
-    score = score - 1;
+  else {
+    if (second() < now) {
+      if (second()+(60-now) > randomround) {
+        now = second();
+        randomround = int(random(2, 9));
+        mode = mode == 1 ? 2 : 1;
+        println("Estamos no modo " + mode + " por " + randomround + " segundos!");
+      }
+     }
+    else {
+      if (second() == (now+randomround)){
+        now = second();
+        randomround = int(random(2, 9));
+        mode = mode == 1 ? 2 : 1;
+        println("Estamos no modo " + mode + " por " + randomround + " segundos!");
+      }
+    }
+  }
+}
+
+void runGame (String[] separatedvalues) {
+  if (mode == 1) {
+    if (int(separatedvalues[0]) == 1 && int(separatedvalues[2]) == 0) {
+      score = score + 1;
+    }
+    else if (int(separatedvalues[0]) == 0 && int(separatedvalues[2]) == 1) {
+      score = score - 1;
+    }
+  }
+  else {
+    if (int(separatedvalues[1]) == 1 && int(separatedvalues[3]) == 0) {
+      score = score + 1;
+    }
+    else if (int(separatedvalues[1]) == 0 && int(separatedvalues[3]) == 1) {
+      score = score - 1;
+    }
   }
   
   if (score == 0 || score == 40) {
@@ -88,15 +148,20 @@ void runGameOver(String[] separatedvalues) {
   if (int(separatedvalues[1]) == 1 && istimetorestart[1] != 1) {
     istimetorestart[1] = 1;
   }
+  if (int(separatedvalues[2]) == 1 && istimetorestart[2] != 1) {
+    istimetorestart[2] = 1;
+  }
+  if (int(separatedvalues[3]) == 1 && istimetorestart[3] != 1) {
+    istimetorestart[3] = 1;
+  }
   
-  //print(istimetorestart[0] == 1 ? "APERTOU e " : "não e ");
-  //print(istimetorestart[1] == 1 ? "APERTOU" : "não");
-  
-  if (istimetorestart[0] == 1 && istimetorestart[1] == 1) {
+  if (istimetorestart[0] == 1 && istimetorestart[1] == 1 && istimetorestart[2] == 1 && istimetorestart[3] == 1) {
     score = 20;
     winner = 0;
     istimetorestart[0] = 0; 
     istimetorestart[1] = 0;
+    istimetorestart[2] = 0; 
+    istimetorestart[3] = 0;
     isgamerunning = true; 
   }
 }
@@ -124,11 +189,17 @@ void drawGameOverTexts() {
     
     textSize(20);
     String icon01 = istimetorestart[0] == 0 ? "X" : "OK";
-    text(icon01, (width/2)-80, (height/2)+200);
+    text(icon01, (width/2)-150, (height/2)+200);
     
     String icon02 = istimetorestart[1] == 0 ? "X" : "OK";
-    text(icon02, (width/2)+80, (height/2)+200);
+    text(icon02, (width/2)-80, (height/2)+200);
     
-    String icon03 = "|";
-    text(icon03, width/2, (height/2)+200);
+    String icon03 = istimetorestart[2] == 0 ? "X" : "OK";
+    text(icon03, (width/2)+80, (height/2)+200);
+    
+    String icon04 = istimetorestart[3] == 0 ? "X" : "OK";
+    text(icon04, (width/2)+150, (height/2)+200);
+    
+    String icon05 = "|";
+    text(icon05, width/2, (height/2)+200);
 }
