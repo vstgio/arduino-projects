@@ -20,15 +20,25 @@ PFont font;
 int now = -1;
 int randomround;
 int mode;
+Animation button01;
+Animation button02;
+Animation button03;
+Animation button04;
 
 void setup() {
-  size(1000, 600);
+  fullScreen();
   score = proportion/2;
   
   noStroke();
   background(color02);
   fill(color01);
   rect(0, 0, score*(width/proportion), height);
+  
+  frameRate(16);
+  button01 = new Animation("roxo-0", 3);
+  button02 = new Animation("verde-0", 3);
+  button03 = new Animation("roxo-0", 3);
+  button04 = new Animation("verde-0", 3);
   
   font = createFont("Press Start 2P Regular", 32);
   
@@ -72,15 +82,13 @@ void draw() {
 
 void drawButtonColor() {
     if (mode == 1) {
-      fill(142, 68, 173); //roxo botão 01
+      button01.display(30, 20);                             //botão roxo player 01
+      button03.display((width-30)-button02.getWidth(), 20); //botão roxo player 02
     }
     else {
-      fill(38, 166, 91);  //verde botão 02
+      button02.display(30, 20);                             //botão verde player 01
+      button04.display((width-30)-button02.getWidth(), 20); //botão verde player 02
     }
-    
-    rect(0, 0, buttonwidth, height);    
-    rect(width-buttonwidth, 0, buttonwidth, height);
-    noStroke();
 }
 
 void calculateRandomRound() {
@@ -202,4 +210,30 @@ void drawGameOverTexts() {
     
     String icon05 = "|";
     text(icon05, width/2, (height/2)+200);
+}
+
+class Animation {
+  PImage[] images;
+  int imageCount;
+  int frame;
+  
+  Animation(String imagePrefix, int count) {
+    imageCount = count;
+    images = new PImage[imageCount];
+    
+    for (int i = 0; i < imageCount; i++) {
+      String filename = imagePrefix + i + ".png";
+      images[i] = loadImage(filename);
+      images[i].resize(images[i].width/16, images[i].height/16);
+    }
+  }
+
+  void display(float xpos, float ypos) {
+    frame = (frame+1) % imageCount;
+    image(images[frame], xpos, ypos);
+  }
+  
+  int getWidth() {
+    return images[0].width;
+  } 
 }
